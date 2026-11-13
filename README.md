@@ -6,7 +6,7 @@
 
 **Write what you need in your own words. SuperPrompt turns it into a clear, structured prompt**
 
-[Website](https://superprompt.pages.dev/) · [Download for Windows](https://github.com/Soiltary/SuperPrompt/releases/latest) · [Support](https://tip.dokan.sa/solitary) · [X @Soiltary](https://x.com/Soiltary)
+[Website](https://superprompt.pages.dev/) · [Download for Windows](https://github.com/Soiltary/SuperPrompt/releases/latest) · [Support](https://tip.dokan.sa/solitary) · [X @Soiltary](https://x.com/Soiltary) · [MIT License](LICENSE)
 
 [العربية](#العربية) · [English](#english)
 
@@ -69,7 +69,9 @@ npx wrangler pages deploy site --project-name superprompt --branch main
 | `desktop/` | Windows app (`SuperPromptApp.cs`), build script and tests |
 | `deploy/` | Website build and publishing scripts |
 
-### Third-party components
+### License
+
+SuperPrompt is released under the [MIT License](LICENSE). Third-party components keep their own licenses:
 
 - IBM Plex Sans Arabic, SIL Open Font License 1.1 (`app/fonts/OFL.txt`)
 - Microsoft WebView2 SDK 1.0.4314.35, redistributed in the Windows package under its own license (downloaded by `desktop/get-webview2.ps1`)
@@ -107,7 +109,9 @@ SuperPrompt مولّد برومبتات يشتغل بالكامل على جها�
 4. تنزيل WebView2 SDK أول مرة بـ `desktop\get-webview2.ps1`، ثم بناء البرنامج بـ `desktop\build-exe.ps1`
 5. النشر على Cloudflare Pages من مجلد `deploy` بعد تحديث `release.next.json`
 
-### مكونات خارجية
+### الترخيص
+
+SuperPrompt منشور بترخيص [MIT](LICENSE)، والمكونات الخارجية تبقى بتراخيصها:
 
 - خط IBM Plex Sans Arabic بترخيص SIL Open Font License 1.1
 - Microsoft WebView2 SDK 1.0.4314.35، ويُوزّع داخل حزمة ويندوز بترخيصه الخاص
