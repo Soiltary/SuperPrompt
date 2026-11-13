@@ -47,6 +47,10 @@ function MouseClick($e, $win) {
   [W32]::SetCursorPos([int]($r.X + $r.Width / 2), [int]($r.Y + $r.Height / 2)) | Out-Null; Start-Sleep -Milliseconds 100
   [W32]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero); [W32]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero)
 }
+function Focus($e) {
+  for ($k = 0; $k -lt 20; $k++) { try { $e.SetFocus(); return } catch { Start-Sleep -Milliseconds 500 } }
+  throw "element never accepted focus: $($e.Current.Name)"
+}
 function Value($e) { try { $e.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).Current.Value } catch { '' } }
 
 $dl = Join-Path $env:USERPROFILE 'Downloads'
@@ -67,18 +71,18 @@ $typed = 0
 do {
   $typed++
   [W32]::SetForegroundWindow([IntPtr]$w.Current.NativeWindowHandle) | Out-Null; Start-Sleep -Milliseconds 300
-  $goal.SetFocus(); Start-Sleep -Milliseconds 300
-  [System.Windows.Forms.Clipboard]::SetText("Outlook keeps asking for my password after the Windows 11 update, account test@example.com, ticket $run")
+  Focus $goal; Start-Sleep -Milliseconds 300
   [System.Windows.Forms.SendKeys]::SendWait('^a'); Start-Sleep -Milliseconds 200
-  [System.Windows.Forms.SendKeys]::SendWait('^v'); Start-Sleep -Milliseconds 500
+  # typed, not pasted: Windows Sandbox shares its clipboard with the host, so a paste can carry the host's text
+  [System.Windows.Forms.SendKeys]::SendWait("Outlook keeps asking for my password after the Windows 11 update, account test@example.com, ticket $run"); Start-Sleep -Milliseconds 600
 } while (-not (Value $goal).Contains($run) -and $typed -lt 4)
-$R.typedAttempts = $typed
+$R.typedAttempts = $typed; $R.goalValue = (Value $goal); if (-not $R.goalValue.Contains($run)) { throw "typing failed after $typed attempts; goal=[$($R.goalValue)]" }
 # press Generate from the keyboard (focus + Enter is a real user action), then wait until the token shows in the result
 $gen = 0
 do {
   $gen++
   [W32]::SetForegroundWindow([IntPtr]$w.Current.NativeWindowHandle) | Out-Null
-  $gb = ByName $w $CT::Button '^(Generate|توليد)'; $gb.SetFocus(); Start-Sleep -Milliseconds 300
+  $gb = ByName $w $CT::Button '^(Generate|توليد)'; Focus $gb; Start-Sleep -Milliseconds 300
   [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep 2
 } while (-not ((@(All $w $CT::Text | ForEach-Object { $_.Current.Name }) -join "`n").Contains($run)) -and $gen -lt 3)
 $R.generatePresses = $gen
@@ -87,7 +91,7 @@ $shown = (@(All $w $CT::Text | ForEach-Object { $_.Current.Name }) -join "`n")
 $R.generate = @{ resultShowsToken = $shown.Contains($run); resultShowsEmail = $shown.Contains('test@example.com') }
 Set-Clipboard -Value 'before-copy'
 $tries = 0
-do { $tries++; [W32]::SetForegroundWindow([IntPtr]$w.Current.NativeWindowHandle) | Out-Null; $cb = ByName $w $CT::Button '^(Copy|نسخ)$'; $cb.SetFocus(); Start-Sleep -Milliseconds 300; [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep 1 } while ((Get-Clipboard -Raw) -eq 'before-copy' -and $tries -lt 4)
+do { $tries++; [W32]::SetForegroundWindow([IntPtr]$w.Current.NativeWindowHandle) | Out-Null; $cb = ByName $w $CT::Button '^(Copy|نسخ)$'; Focus $cb; Start-Sleep -Milliseconds 300; [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep 1 } while ((Get-Clipboard -Raw) -eq 'before-copy' -and $tries -lt 4)
 $R.copyClicks = $tries
 $clip = (Get-Clipboard -Raw) -replace "`r`n", "`n"
 $R.copy = @{ clipboardChars = $clip.TrimEnd("`n").Length; hasToken = $clip.Contains($run) }
