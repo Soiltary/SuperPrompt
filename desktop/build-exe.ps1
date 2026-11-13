@@ -1,9 +1,9 @@
 # Builds desktop\out\SuperPrompt.exe with the C# compiler that ships with Windows, embedding deploy\site
 # (the same files as the website, without the download folder and _headers), then packs the portable ZIP.
-param([string]$Version = '2.1.1')
+param([string]$Version = '2.2.0')
 $ErrorActionPreference = 'Stop'
 $proj = Split-Path -Parent $PSScriptRoot
-$site = Join-Path $proj 'deploy\site'
+$site = Join-Path $proj 'deploy\site\app'   # only the generator: the landing page and its video stay on the website
 $out = Join-Path $PSScriptRoot 'out'
 if (Test-Path $out) { Remove-Item $out -Recurse -Force }
 New-Item -ItemType Directory $out | Out-Null

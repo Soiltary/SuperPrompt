@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="experiments/brand/icon-128.png" width="96" height="96" alt="SuperPrompt">
+<img src="experiments/brand/v3/logo-256.png" width="120" height="120" alt="SuperPrompt">
 
 # SuperPrompt
 
@@ -26,7 +26,7 @@ SuperPrompt is a prompt builder that runs entirely on your device. Describe a ta
 
 | | |
 |---|---|
-| In the browser | https://superprompt.pages.dev/ |
+| In the browser | https://superprompt.pages.dev/app/ (the home page https://superprompt.pages.dev/ has the demo video and the download) |
 | On Windows | [Latest release](https://github.com/Soiltary/SuperPrompt/releases/latest): `SuperPrompt-<version>-windows-x64-portable.zip` |
 
 **Windows app:** download the ZIP, unzip it, then open `SuperPrompt.exe`. No installation. Windows 10 and 11, 64-bit. The app opens in its own window using the Microsoft WebView2 runtime that ships with Windows, and keeps your data in `%LOCALAPPDATA%\SuperPrompt`. The file is not code-signed, so SmartScreen may ask once: **More info → Run anyway**. Compare the file with the SHA-256 listed in the release.
@@ -46,7 +46,17 @@ powershell -File deploy\make-site.ps1
 
 # 4. Build the Windows app (first time: fetch the WebView2 SDK from nuget.org)
 powershell -File desktop\get-webview2.ps1
-powershell -File desktop\build-exe.ps1 -Version 2.1.1    # -> deploy\dist\SuperPrompt-2.1.1-windows-x64-portable.zip
+powershell -File desktop\build-exe.ps1 -Version 2.2.0    # -> deploy\dist\SuperPrompt-2.2.0-windows-x64-portable.zip
+```
+
+Logo, icons and the demo video (only when they change):
+
+```powershell
+# transparent logo in every size from the approved artwork, then SuperPrompt.ico and the app icons
+node experiments\brand\make-logo.js <logo image> experiments\brand\v3
+powershell -File experiments\brand\make-icons.ps1
+# demo video (Arabic and English) recorded from the real generator; needs ffmpeg with libx264
+node experiments\video\record-demo.js <path to ffmpeg.exe> both
 ```
 
 Publishing the website (Cloudflare Pages, project `superprompt`):
@@ -65,9 +75,11 @@ npx wrangler pages deploy site --project-name superprompt --branch main
 |---|---|
 | `app/` | The website and app: engine (`prompt-lexicon.js`, `prompt-engine.js`, `generator.js`), interface (`app.js`, `storage.js`, styles), generated pages, local launcher |
 | `experiments/page-generator/` | Page generator and all interface text in Arabic and English |
-| `experiments/brand/` | Logo and icons |
+| `experiments/brand/` | Logo (`v3/`), icons and the scripts that make them |
 | `desktop/` | Windows app (`SuperPromptApp.cs`), build script and tests |
 | `deploy/` | Website build and publishing scripts |
+| `deploy/landing/` | The home page of the website: intro, demo video with Arabic and English subtitles, download and support (not part of the Windows app) |
+| `experiments/video/` | Script that records the demo video from the generator |
 
 ### License
 
@@ -94,7 +106,7 @@ SuperPrompt مولّد برومبتات يشتغل بالكامل على جها�
 
 | | |
 |---|---|
-| في المتصفح | https://superprompt.pages.dev/ |
+| في المتصفح | https://superprompt.pages.dev/app/ (والصفحة الرئيسية https://superprompt.pages.dev/ فيها فيديو الشرح والتحميل) |
 | على ويندوز | [آخر إصدار](https://github.com/Soiltary/SuperPrompt/releases/latest): `SuperPrompt-<version>-windows-x64-portable.zip` |
 
 **برنامج ويندوز:** نزّل ملف ZIP، فك الضغط، ثم افتح `SuperPrompt.exe`. بدون تثبيت، ويشتغل على ويندوز 10 و11 بنظام 64 بت. يفتح في نافذته الخاصة باستخدام محرك Microsoft WebView2 الموجود في ويندوز، وبياناتك تبقى في `%LOCALAPPDATA%\SuperPrompt`. الملف غير موقّع رقميًا، فممكن يطلب SmartScreen تأكيد مرة وحدة: **More info ثم Run anyway**. طابق الملف مع بصمة SHA-256 المكتوبة في صفحة الإصدار

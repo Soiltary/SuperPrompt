@@ -10,6 +10,15 @@ $info = [ordered]@{ zip = $zip.Name; sha256 = (Get-FileHash $zip.FullName -Algor
   edgePresent = Test-Path 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' }
 $sig = Get-AuthenticodeSignature (Join-Path $dest 'SuperPrompt.exe'); $info.signature = "$($sig.Status)"; $info.exeVersion = (Get-Item (Join-Path $dest 'SuperPrompt.exe')).VersionInfo.ProductVersion
 $info | ConvertTo-Json | Set-Content "$res\env.json" -Encoding UTF8
+# the new icon: the file's own icon, File Explorer showing the folder, and the running window with its taskbar button
+Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+function Shot($name) { $b=[System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp=New-Object System.Drawing.Bitmap $b.Width,$b.Height; $g=[System.Drawing.Graphics]::FromImage($bmp); $g.CopyFromScreen($b.Location,[System.Drawing.Point]::Empty,$b.Size); $bmp.Save("$res\$name"); $g.Dispose(); $bmp.Dispose() }
+$exePath = Join-Path $dest 'SuperPrompt.exe'
+([System.Drawing.Icon]::ExtractAssociatedIcon($exePath)).ToBitmap().Save("$res\exe-icon-32.png")
+$ex = Start-Process explorer.exe -ArgumentList "`"$dest`"" -PassThru; Start-Sleep 5; Shot 'explorer-folder.png'
+Get-Process explorer -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq 'SuperPrompt' } | ForEach-Object { $_.CloseMainWindow() | Out-Null }
+$app = Start-Process $exePath -PassThru; Start-Sleep 9; Shot 'app-window.png'
+Get-Process SuperPrompt -ErrorAction SilentlyContinue | ForEach-Object { $_.CloseMainWindow() | Out-Null }; Start-Sleep 4
 try { & 'C:\sbx\tools\ui-test.ps1' -Exe (Join-Path $dest 'SuperPrompt.exe') -ImportFile 'C:\sbx\tools\export-from-web.json' -Out "$res\ui-test-sandbox.json" *> "$res\ui-test-log.txt" } catch { "$_" | Set-Content "$res\ui-test-error.txt"; Add-Type -AssemblyName System.Windows.Forms, System.Drawing; $b=[System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp=New-Object System.Drawing.Bitmap $b.Width,$b.Height; $g=[System.Drawing.Graphics]::FromImage($bmp); $g.CopyFromScreen($b.Location,[System.Drawing.Point]::Empty,$b.Size); $bmp.Save("$res\error-screen.png") }
 $sl = Join-Path $env:LOCALAPPDATA 'SuperPrompt\startup.log'; if (Test-Path $sl) { Copy-Item $sl "$res\startup.log" }
 'done' | Set-Content "$res\DONE.txt"

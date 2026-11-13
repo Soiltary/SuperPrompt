@@ -1060,12 +1060,23 @@
   /* ---------- rendering by format ---------- */
   function render(S, format, lang) {
     var sep = lang === "ar" ? "؛ " : "; ";
-    if (format === "plain") return S.map(function (s) { return s.h + ": " + s.items.join(s.type === "p" ? " " : sep); }).join("\n\n");
+    // join items on one line: a sentence that already ends with a stop needs only a space (no ".;")
+    function joinLine(items, type) {
+      if (type === "p") return items.join(" ");
+      return items.reduce(function (acc, it, i) { return i === 0 ? it : acc + (/[.!?؟…]["»”)]?$/.test(acc) ? " " : sep) + it; }, "");
+    }
+    // "Goal: Task: ..." -> "Task: ...": a single item that carries its own short label keeps that label only
+    function line(s) {
+      var body = joinLine(s.items, s.type);
+      if (s.items.length === 1 && /^[^:\n«"]{1,28}:\s/.test(s.items[0])) return body;
+      return s.h + ": " + body;
+    }
+    if (format === "plain") return S.map(line).join("\n\n");
     if (format === "steps") {
       var out = [], n = 1;
       S.forEach(function (s) {
         if (s.type === "ol") s.items.forEach(function (it) { out.push((n++) + ". " + it); });
-        else out.push((n++) + ". " + s.h + ": " + s.items.join(s.type === "p" ? " " : sep));
+        else out.push((n++) + ". " + line(s));
       });
       return out.join("\n");
     }

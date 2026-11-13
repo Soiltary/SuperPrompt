@@ -18,9 +18,9 @@ using Microsoft.Win32;
 [assembly: AssemblyProduct("SuperPrompt")]
 [assembly: AssemblyDescription("Offline personal prompt builder")]
 [assembly: AssemblyCopyright("SuperPrompt 2026")]
-[assembly: AssemblyVersion("2.1.1.0")]
-[assembly: AssemblyFileVersion("2.1.1.0")]
-[assembly: AssemblyInformationalVersion("2.1.1")]
+[assembly: AssemblyVersion("2.2.0.0")]
+[assembly: AssemblyFileVersion("2.2.0.0")]
+[assembly: AssemblyInformationalVersion("2.2.0")]
 
 static class SuperPromptApp
 {

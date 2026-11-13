@@ -122,15 +122,11 @@ def I(name, size=16, sw=2, cls=None):
     extra = ' class="%s"' % cls if cls else ""
     return svg(P[name], size, sw, extra)
 
-# SuperPrompt identity (Nov 2026): violet -> space-blue tile, prompt caret, cyan spark
-MARK_SVG = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>"
-            "<defs><linearGradient id='spg' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#8B5CF6'/><stop offset='1' stop-color='#2563EB'/></linearGradient></defs>"
-            "<rect width='64' height='64' rx='16' fill='url(#spg)'/>"
-            "<path d='M18 22l12 10-12 10' fill='none' stroke='#fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>"
-            "<path d='M34 44h12' stroke='#fff' stroke-width='6' stroke-linecap='round'/>"
-            "<path d='M47 10l2.8 6.7L56.5 19.5l-6.7 2.8L47 29l-2.8-6.7L37.5 19.5l6.7-2.8z' fill='#A5F3FC'/></svg>")
-FAVICON = "data:image/svg+xml," + urllib.parse.quote(MARK_SVG, safe="/:=' ")
-LOGO = MARK_SVG.replace("<svg ", '<svg class="brand-mark" aria-hidden="true" ', 1)
+# SuperPrompt identity (v3, Nov 2026): the approved logo, a silver prompt caret with a glowing blue underscore
+# (experiments/brand/v3, transparent PNG). The header mark is an image so every copy shows the same logo.
+def LOGO_IMG(R):
+    return (f'<img class="brand-mark" src="{R}logo-64.png" srcset="{R}logo-64.png 1x, {R}logo-128.png 2x" '
+            'width="36" height="36" alt="" aria-hidden="true" decoding="async">')
 
 NAV = [("home", "", "nav.home", "home"), ("guide", "guide/", "nav.guide", "zap"), ("blog", "en/blog/", "nav.blog", "book"),
        ("prompts", "prompts/", "nav.prompts", "library"), ("history", "history/", "nav.history", "clock"), ("about", "about/", "nav.about", "info")]
@@ -158,7 +154,7 @@ def header(R, lang, active):
         items.append('<a class="menu-item" href="%s"%s>%s<span data-i18n="%s">%s</span></a>' % (href(R, p), cur, I(ic, 16), k, E(tx(k, lang))))
     return f'''<header class="site-header">
   <div class="header-inner">
-    <a class="brand" id="home-link" href="{href(R, '')}" aria-label="SuperPrompt" dir="ltr">{LOGO}<span class="brand-text"><span class="brand-name"><b class="wm-a">Super</b><b class="wm-b">Prompt</b></span></span></a>
+    <a class="brand" id="home-link" href="{href(R, '')}" aria-label="SuperPrompt" dir="ltr">{LOGO_IMG(R)}<span class="brand-text"><span class="brand-name"><b class="wm-a">Super</b><b class="wm-b">Prompt</b></span></span></a>
     <nav class="main-nav" data-i18n-attr="aria-label:aria.mainnav" aria-label="{E(tx('aria.mainnav', lang))}">{''.join(links)}</nav>
     <div class="header-actions">
       <button type="button" class="icon-btn theme-btn" data-action="theme" data-i18n-attr="aria-label:aria.theme" aria-label="{E(tx('aria.theme', lang))}">{I('moon', 16, 2, 'i-moon')}{I('sun', 16, 2, 'i-sun')}</button>
@@ -224,7 +220,7 @@ def page(path, lang, active, title_key, main_html, scripts=(), desc=None):
 <meta name="description" content="{E(d)}">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#7C3AED">
-<link rel="icon" href="{R}favicon.svg" type="image/svg+xml">
+<link rel="icon" href="{R}favicon-32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="{R}favicon.png" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="{R}icon-180.png">
 <link rel="stylesheet" href="{R}styles.css">
@@ -274,7 +270,7 @@ def home_main(R, lang="en"):
         faq_html += (f'<details class="faq-item" id="faq-{i}"><summary class="faq-q">'
                      f'{I("help", 20)}<span class="q-text" data-i18n="faq{i}.q">{E(tx("faq%d.q" % i, lang))}</span> <span class="q-sign">+</span></summary>'
                      f'<div class="faq-a">{el("p", "faq%d.a" % i, lang)}</div></details>')
-    # Same markup in every copy; app.js fills it from release.json and shows it only on the hosted site
+    # Not shown any more: since v2.2.0 the website's landing page (deploy/landing) holds the download; kept for reference
     # (release.json is published with the website, never embedded in the Windows app or used locally).
     get_bar = (f'<div class="get-bar" id="get-bar" hidden>'
                f'<a class="get-btn get-web" href="#goal" data-action="focus-goal">{I("globe", 18)}<span data-i18n="get.web">{E(tx("get.web", lang))}</span></a>'
@@ -287,7 +283,6 @@ def home_main(R, lang="en"):
   <div class="ws-wrap">
     <header class="ws-head">
       <div class="ws-title">{el("h1", "home.h1", lang)}{el("p", "home.sub", lang)}</div>
-      {get_bar}
     </header>
     <div class="ws-grid">
       <section class="ws-panel ws-compose step-card" id="composer" aria-labelledby="lbl-goal">
@@ -564,8 +559,6 @@ _used.update(re.findall(r'data-copy-label=\'([^\']+)\'', _appjs))
 _used.update(["copy", "copied", "history.less", "history.more", "history.save", "r.view", "r.edit", "r.saved", "r.save", "gen.btn", "gen.busy", "lib.copy"])
 en = {k: nodot(v[0]) for k, v in T.items() if k in _used}
 ar = {k: iso(k, nodot(v[1]), "ar") for k, v in T.items() if k in _used}
-with open(os.path.join(APP, "favicon.svg"), "w", encoding="utf-8", newline="\n") as f:
-    f.write(MARK_SVG)
 with open(os.path.join(APP, "i18n.js"), "w", encoding="utf-8", newline="\n") as f:
     f.write("/* Interface text in English and Arabic (generated from the page content). */\n")
     f.write("window.MPZ_I18N = " + json.dumps({"en": en, "ar": ar}, ensure_ascii=False, separators=(",", ":")) + ";\n")

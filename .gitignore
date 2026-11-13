@@ -13,6 +13,9 @@
 /experiments/*
 !/experiments/page-generator/
 !/experiments/brand/
+!/experiments/video/
+/experiments/video/out/
+/experiments/brand/v3/.chrome-profile/
 
 # generator leftovers and one-off migration scripts
 /experiments/page-generator/__pycache__/

@@ -79,8 +79,10 @@ body {
 /* ---------- header and wordmark ---------- */
 .site-header { backdrop-filter: saturate(160%) blur(12px); -webkit-backdrop-filter: saturate(160%) blur(12px); }
 .brand { gap: 10px; min-width: 0; }
-.brand-mark { width: 34px; height: 34px; border-radius: 10px; box-shadow: 0 6px 16px -6px rgba(109, 78, 240, 0.65); }
-html[data-theme="dark"] .brand-mark { filter: none; }   /* the old black mark was inverted in dark mode; the new one has its own colours */
+/* the approved logo (transparent PNG): same shape and direction in Arabic and English, never mirrored or inverted */
+.brand-mark { width: 36px; height: 36px; object-fit: contain; flex: none; filter: drop-shadow(0 2px 3px rgba(30, 27, 75, 0.28)); }
+html[dir="rtl"] .brand-mark { transform: none; }
+html[data-theme="dark"] .brand-mark { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.28)); }
 .brand-name { font-size: 19px; letter-spacing: -0.02em; display: inline-flex; }
 .brand-name .wm-a { font-weight: 800; color: var(--heading); }
 .brand-name .wm-b { font-weight: 800; background: var(--brand-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }

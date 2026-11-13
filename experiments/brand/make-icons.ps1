@@ -1,34 +1,29 @@
-# Renders app\favicon.svg to PNG sizes and a multi-size .ico (PNG-compressed entries), no downloads.
+# Builds the icons of SuperPrompt from the approved logo (experiments\brand\v3, made by make-logo.js):
+# the multi-size SuperPrompt.ico for SuperPrompt.exe (PNG entries), the website/app icons in app\, and icon-N.png here.
+# Run make-logo.js first:  node experiments\brand\make-logo.js research\brand-v3\superprompt-logo-source.webp experiments\brand\v3
 $ErrorActionPreference = 'Stop'
 $proj = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $app = Join-Path $proj 'app'
+$v3 = Join-Path $PSScriptRoot 'v3'
 $out = $PSScriptRoot
-$svg = Get-Content (Join-Path $app 'favicon.svg') -Raw
-$html = Join-Path $out 'render.html'
-"<html><body style='margin:0;background:transparent'><div style='width:512px;height:512px'>$($svg -replace '<svg ', '<svg width=''512'' height=''512'' ')</div></body></html>" | Set-Content $html -Encoding UTF8
-$big = Join-Path $out 'icon-512.png'
-$prof = Join-Path $out 'chrome-prof'
-$args1 = @('--headless=new', '--disable-gpu', '--hide-scrollbars', '--default-background-color=00000000', "--user-data-dir=`"$prof`"", '--window-size=512,512', "--screenshot=`"$big`"", ('"file:///' + ($html -replace '\\','/') + '"'))
-Start-Process -FilePath 'C:\Program Files\Google\Chrome\Application\chrome.exe' -ArgumentList $args1 -Wait -WindowStyle Hidden
-Start-Sleep 1
-Remove-Item $prof -Recurse -Force -ErrorAction SilentlyContinue
+# ICO for SuperPrompt.exe: the transparent mark, so it sits on any Explorer or taskbar colour.
+# Sizes up to 128 are classic 32-bit DIB entries (the C# compiler's /win32icon does not embed PNG-compressed small
+# entries correctly, and Windows then shows its generic program icon); 256 stays PNG, as Windows expects.
 Add-Type -AssemblyName System.Drawing
-$src = [System.Drawing.Image]::FromFile($big)
-function Save-Size([int]$n, [string]$path) {
-  $bmp = New-Object System.Drawing.Bitmap $n, $n
-  $g = [System.Drawing.Graphics]::FromImage($bmp)
-  $g.InterpolationMode = 'HighQualityBicubic'; $g.SmoothingMode = 'HighQuality'; $g.PixelOffsetMode = 'HighQuality'; $g.CompositingQuality = 'HighQuality'
-  $g.Clear([System.Drawing.Color]::Transparent)
-  $g.DrawImage($src, 0, 0, $n, $n)
-  $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
-  $g.Dispose(); $bmp.Dispose()
+function DibEntry([string]$png) {
+  $bmp = [System.Drawing.Bitmap]::FromFile($png); $n = $bmp.Width
+  $ms = New-Object System.IO.MemoryStream; $w = New-Object System.IO.BinaryWriter $ms
+  $w.Write([UInt32]40); $w.Write([Int32]$n); $w.Write([Int32]($n * 2)); $w.Write([UInt16]1); $w.Write([UInt16]32)
+  $w.Write([UInt32]0); $w.Write([UInt32]0); $w.Write([Int32]0); $w.Write([Int32]0); $w.Write([UInt32]0); $w.Write([UInt32]0)
+  for ($y = $n - 1; $y -ge 0; $y--) { for ($x = 0; $x -lt $n; $x++) { $c = $bmp.GetPixel($x, $y); $w.Write([byte]$c.B); $w.Write([byte]$c.G); $w.Write([byte]$c.R); $w.Write([byte]$c.A) } }
+  $rowBytes = [int]([math]::Ceiling($n / 32.0) * 4)
+  for ($y = $n - 1; $y -ge 0; $y--) { $row = New-Object byte[] $rowBytes
+    for ($x = 0; $x -lt $n; $x++) { if ($bmp.GetPixel($x, $y).A -lt 128) { $row[[int][math]::Floor($x / 8)] = $row[[int][math]::Floor($x / 8)] -bor (0x80 -shr ($x % 8)) } }
+    $w.Write($row) }
+  $bmp.Dispose(); $w.Flush(); return ,$ms.ToArray()
 }
-$sizes = 16, 24, 32, 48, 64, 128, 180, 256
-foreach ($n in $sizes) { Save-Size $n (Join-Path $out "icon-$n.png") }
-$src.Dispose()
-# ICO with PNG entries (Windows Vista and later)
 $icoSizes = 16, 24, 32, 48, 64, 128, 256
-$pngs = $icoSizes | ForEach-Object { [System.IO.File]::ReadAllBytes((Join-Path $out "icon-$_.png")) }
+$pngs = $icoSizes | ForEach-Object { $f = Join-Path $v3 "logo-$_.png"; if ($_ -ge 256) { ,[System.IO.File]::ReadAllBytes($f) } else { DibEntry $f } }
 $ms = New-Object System.IO.MemoryStream
 $bw = New-Object System.IO.BinaryWriter $ms
 $bw.Write([UInt16]0); $bw.Write([UInt16]1); $bw.Write([UInt16]$icoSizes.Count)
@@ -42,8 +37,11 @@ for ($i = 0; $i -lt $icoSizes.Count; $i++) {
 foreach ($p in $pngs) { $bw.Write($p) }
 $bw.Flush()
 [System.IO.File]::WriteAllBytes((Join-Path $out 'SuperPrompt.ico'), $ms.ToArray())
-Copy-Item (Join-Path $out 'icon-64.png') (Join-Path $app 'favicon.png') -Force
-Copy-Item (Join-Path $out 'icon-180.png') (Join-Path $app 'icon-180.png') -Force
-Remove-Item $html
-Get-ChildItem $out -Filter '*.png' | Select-Object Name, Length
+foreach ($n in 16, 24, 32, 48, 64, 128, 180, 256, 512) { Copy-Item (Join-Path $v3 "logo-$n.png") (Join-Path $out "icon-$n.png") -Force }
+# website and app: header mark (1x/2x), browser tab icons, home-screen icon on the dark tile (iOS fills transparency with black)
+Copy-Item (Join-Path $v3 'logo-64.png') (Join-Path $app 'logo-64.png') -Force
+Copy-Item (Join-Path $v3 'logo-128.png') (Join-Path $app 'logo-128.png') -Force
+Copy-Item (Join-Path $v3 'logo-32.png') (Join-Path $app 'favicon-32.png') -Force
+Copy-Item (Join-Path $v3 'logo-64.png') (Join-Path $app 'favicon.png') -Force
+Copy-Item (Join-Path $v3 'tile-180.png') (Join-Path $app 'icon-180.png') -Force
 Get-Item (Join-Path $out 'SuperPrompt.ico') | Select-Object Name, Length
