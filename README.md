@@ -4,58 +4,72 @@
 
 # SuperPrompt
 
-**Write what you need in your own words. SuperPrompt turns it into a clear, structured prompt**
+**Write what you need in your own words. SuperPrompt turns it into a clear, structured prompt.**
 
-[Website](https://superprompt.pages.dev/) · [Download for Windows](https://github.com/Soiltary/SuperPrompt/releases/latest) · [Support](https://tip.dokan.sa/solitary) · [X @Soiltary](https://x.com/Soiltary) · [MIT License](LICENSE)
-
-[العربية](#العربية) · [English](#english)
+[Website](https://superprompt.pages.dev/) · [Open the generator](https://superprompt.pages.dev/app/) · [Download for Windows](https://github.com/Soiltary/SuperPrompt/releases/latest) · [Support](https://tip.dokan.sa/solitary) · [X @Soiltary](https://x.com/Soiltary) · [MIT License](LICENSE)
 
 </div>
 
-## English
+## What it does
 
-SuperPrompt is a prompt builder that runs entirely on your device. Describe a task in Saudi dialect, formal Arabic or English, and it writes a structured prompt you can paste into Claude, ChatGPT, Gemini, Copilot, Codex or any other assistant.
+SuperPrompt is a prompt builder that runs entirely on your device. Describe a task in Saudi dialect, formal Arabic or English, and it writes a structured prompt with a goal, steps, limits and a check, ready to paste into Claude, ChatGPT, Gemini, Copilot, Codex or any other assistant.
 
-- Works offline: no account, no subscription, no AI calls, no analytics. Nothing you type leaves your device
-- 10 modes plus Auto, three detail levels, prompts in 10 output languages
-- Keeps paths, versions, error codes and names exactly as you wrote them
-- History with search, export and import (move it between the website and the Windows app)
-- Arabic and English interface, right-to-left and left-to-right, light and dark themes
+- **Private and offline:** no account, no subscription, no AI calls and no analytics. Nothing you type leaves your device.
+- **Fits the request:** 10 modes plus Auto, three detail levels, three output formats and prompts in 10 languages.
+- **Keeps details exact:** paths, versions, error codes and names stay exactly as you wrote them.
+- **History:** search, edit, export and import, and move your history between the website and the Windows app.
+- **Bilingual interface:** Arabic and English, right-to-left and left-to-right, light and dark themes.
 
-### Use it
+## Get it
 
 | | |
 |---|---|
-| In the browser | https://superprompt.pages.dev/app/ (the home page https://superprompt.pages.dev/ has the demo video and the download) |
-| On Windows | [Latest release](https://github.com/Soiltary/SuperPrompt/releases/latest): `SuperPrompt-<version>-windows-x64-portable.zip` |
+| In the browser | Open the generator at https://superprompt.pages.dev/app/. The home page, https://superprompt.pages.dev/, has a short demo video and the download. |
+| On Windows | Download `SuperPrompt-<version>-windows-x64-portable.zip` from the [latest release](https://github.com/Soiltary/SuperPrompt/releases/latest). |
 
-**Windows app:** download the ZIP, unzip it, then open `SuperPrompt.exe`. No installation. Windows 10 and 11, 64-bit. The app opens in its own window using the Microsoft WebView2 runtime that ships with Windows, and keeps your data in `%LOCALAPPDATA%\SuperPrompt`. The file is not code-signed, so SmartScreen may ask once: **More info → Run anyway**. Compare the file with the SHA-256 listed in the release.
+### Running the Windows app
 
-### Build it
+1. Download the ZIP and unzip it. Keep the files in the folder together.
+2. Open `SuperPrompt.exe`. Nothing is installed, and it works offline.
 
-Requirements: Windows 10 or 11, Python 3.11+, Node.js 24+, Windows PowerShell 5.1 and the C# compiler of .NET Framework 4 (included in Windows).
+The app runs on Windows 10 and 11 (64-bit) and opens in its own window using the Microsoft WebView2 runtime that ships with Windows. Your prompts and settings stay on your PC in `%LOCALAPPDATA%\SuperPrompt`.
+
+The file is not code-signed, so Windows SmartScreen may ask once: choose **More info**, then **Run anyway**. You can check the download against the SHA-256 listed on the release page:
 
 ```powershell
-# 1. Generate the pages into app\ (content lives in experiments\page-generator\*.py)
+Get-FileHash .\SuperPrompt-<version>-windows-x64-portable.zip -Algorithm SHA256
+```
+
+### Moving your history
+
+The website and the Windows app each keep their own history. To move it, open **History → Export** in one copy, then **History → Import** in the other. Imported prompts are merged with the existing ones, and nothing is replaced.
+
+## Build from source
+
+Requirements: Windows 10 or 11, Python 3.11+, Node.js 24+, Windows PowerShell 5.1, and the C# compiler of .NET Framework 4 (included with Windows).
+
+```powershell
+# 1. Generate the pages into app\ (all interface text lives in experiments\page-generator\*.py)
 python experiments\page-generator\build.py app
 
-# 2. Try it locally: double-click app\Start SuperPrompt.bat  (http://127.0.0.1:8765/)
+# 2. Try it locally: double-click app\Start SuperPrompt.bat (opens http://127.0.0.1:8765/)
 
-# 3. Build the website folder deploy\site
+# 3. Build the website folder, deploy\site
 powershell -File deploy\make-site.ps1
 
-# 4. Build the Windows app (first time: fetch the WebView2 SDK from nuget.org)
+# 4. Build the Windows app (the first time, fetch the WebView2 SDK from nuget.org)
 powershell -File desktop\get-webview2.ps1
 powershell -File desktop\build-exe.ps1 -Version 2.2.0    # -> deploy\dist\SuperPrompt-2.2.0-windows-x64-portable.zip
 ```
 
-Logo, icons and the demo video (only when they change):
+Logo, icons and demo video (only needed when they change):
 
 ```powershell
-# transparent logo in every size from the approved artwork, then SuperPrompt.ico and the app icons
+# Transparent logo in every size from the approved artwork, then SuperPrompt.ico and the app icons
 node experiments\brand\make-logo.js <logo image> experiments\brand\v3
 powershell -File experiments\brand\make-icons.ps1
-# demo video (Arabic and English) recorded from the real generator; needs ffmpeg with libx264
+
+# Demo video in Arabic and English, recorded from the real generator (needs ffmpeg with libx264)
 node experiments\video\record-demo.js <path to ffmpeg.exe> both
 ```
 
@@ -64,72 +78,30 @@ Publishing the website (Cloudflare Pages, project `superprompt`):
 ```powershell
 cd deploy
 npm install
-# release.next.json describes the package: version, file, size, SHA-256
+# release.next.json describes the package: version, file, size and SHA-256
 powershell -File make-site.ps1 -WithDownload -ShowButton
 npx wrangler pages deploy site --project-name superprompt --branch main
 ```
 
-### Project layout
+## Project layout
 
-| Folder | What it holds |
+| Folder | Contents |
 |---|---|
-| `app/` | The website and app: engine (`prompt-lexicon.js`, `prompt-engine.js`, `generator.js`), interface (`app.js`, `storage.js`, styles), generated pages, local launcher |
+| `app/` | The generator, shared by the website and the Windows app: engine (`prompt-lexicon.js`, `prompt-engine.js`, `generator.js`), interface (`app.js`, `storage.js`, styles), generated pages and the local launcher |
 | `experiments/page-generator/` | Page generator and all interface text in Arabic and English |
 | `experiments/brand/` | Logo (`v3/`), icons and the scripts that make them |
-| `desktop/` | Windows app (`SuperPromptApp.cs`), build script and tests |
-| `deploy/` | Website build and publishing scripts |
-| `deploy/landing/` | The home page of the website: intro, demo video with Arabic and English subtitles, download and support (not part of the Windows app) |
 | `experiments/video/` | Script that records the demo video from the generator |
+| `desktop/` | Windows app (`SuperPromptApp.cs`), build scripts and tests |
+| `deploy/` | Website build and publishing scripts |
+| `deploy/landing/` | The website's home page: intro, demo video with Arabic and English subtitles, download and support (not part of the Windows app) |
 
-### License
+## License
 
 SuperPrompt is released under the [MIT License](LICENSE). Third-party components keep their own licenses:
 
 - IBM Plex Sans Arabic, SIL Open Font License 1.1 (`app/fonts/OFL.txt`)
 - Microsoft WebView2 SDK 1.0.4314.35, redistributed in the Windows package under its own license (downloaded by `desktop/get-webview2.ps1`)
 
----
+## Support and contact
 
-## العربية
-
-<div dir="rtl">
-
-SuperPrompt مولّد برومبتات يشتغل بالكامل على جهازك. اكتب طلبك باللهجة السعودية أو الفصحى أو الإنجليزي، ويكتب لك برومبت منظّم تلصقه في Claude أو ChatGPT أو Gemini أو Copilot أو Codex أو أي مساعد
-
-- يشتغل بدون إنترنت: بدون حساب ولا اشتراك ولا ذكاء اصطناعي سحابي ولا أدوات تحليل. اللي تكتبه ما يطلع من جهازك
-- 10 أنماط مع التلقائي، وثلاث مستويات تفصيل، وبرومبتات بـ10 لغات
-- يحافظ على المسارات والإصدارات وأكواد الأخطاء والأسماء مثل ما كتبتها
-- سجل فيه بحث وتصدير واستيراد، وتنقله بين الموقع وبرنامج ويندوز
-- واجهة عربية وإنجليزية، من اليمين ومن اليسار، ووضع فاتح وداكن
-
-### الاستخدام
-
-| | |
-|---|---|
-| في المتصفح | https://superprompt.pages.dev/app/ (والصفحة الرئيسية https://superprompt.pages.dev/ فيها فيديو الشرح والتحميل) |
-| على ويندوز | [آخر إصدار](https://github.com/Soiltary/SuperPrompt/releases/latest): `SuperPrompt-<version>-windows-x64-portable.zip` |
-
-**برنامج ويندوز:** نزّل ملف ZIP، فك الضغط، ثم افتح `SuperPrompt.exe`. بدون تثبيت، ويشتغل على ويندوز 10 و11 بنظام 64 بت. يفتح في نافذته الخاصة باستخدام محرك Microsoft WebView2 الموجود في ويندوز، وبياناتك تبقى في `%LOCALAPPDATA%\SuperPrompt`. الملف غير موقّع رقميًا، فممكن يطلب SmartScreen تأكيد مرة وحدة: **More info ثم Run anyway**. طابق الملف مع بصمة SHA-256 المكتوبة في صفحة الإصدار
-
-### البناء
-
-المتطلبات: ويندوز 10 أو 11، وPython 3.11 أو أحدث، وNode.js 24 أو أحدث، وWindows PowerShell 5.1، ومترجم C# الموجود مع .NET Framework 4 في ويندوز. الأوامر نفسها في القسم الإنجليزي:
-
-1. توليد الصفحات داخل `app` من ملفات النصوص في `experiments\page-generator`
-2. التجربة محليًا من `app\Start SuperPrompt.bat` على http://127.0.0.1:8765/
-3. بناء مجلد الموقع بـ `deploy\make-site.ps1`
-4. تنزيل WebView2 SDK أول مرة بـ `desktop\get-webview2.ps1`، ثم بناء البرنامج بـ `desktop\build-exe.ps1`
-5. النشر على Cloudflare Pages من مجلد `deploy` بعد تحديث `release.next.json`
-
-### الترخيص
-
-SuperPrompt منشور بترخيص [MIT](LICENSE)، والمكونات الخارجية تبقى بتراخيصها:
-
-- خط IBM Plex Sans Arabic بترخيص SIL Open Font License 1.1
-- Microsoft WebView2 SDK 1.0.4314.35، ويُوزّع داخل حزمة ويندوز بترخيصه الخاص
-
-### الدعم والتواصل
-
-[دعم](https://tip.dokan.sa/solitary) · [X @Soiltary](https://x.com/Soiltary) · [الموقع](https://superprompt.pages.dev/)
-
-</div>
+If SuperPrompt saves you time, you can [support the project](https://tip.dokan.sa/solitary). For questions and ideas, reach out on [X @Soiltary](https://x.com/Soiltary).
