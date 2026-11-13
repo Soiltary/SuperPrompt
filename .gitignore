@@ -3,6 +3,7 @@
 # build output and the files of the tool that manages this folder) stays local.
 /*
 !/.gitignore
+!/.gitattributes
 !/README.md
 !/LICENSE
 !/app/
