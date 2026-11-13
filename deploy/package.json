@@ -1,0 +1,1 @@
+{ "name": "superprompt-deploy", "private": true, "devDependencies": { "wrangler": "4.156.0" } }

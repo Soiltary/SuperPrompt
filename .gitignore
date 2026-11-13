@@ -1,0 +1,36 @@
+# Only the source needed to edit the website and rebuild the Windows app is published.
+# Everything else in this folder (tests, reports, screenshots, research, backups, local data,
+# build output and the files of the tool that manages this folder) stays local.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/app/
+!/desktop/
+!/deploy/
+!/experiments/
+/experiments/*
+!/experiments/page-generator/
+!/experiments/brand/
+
+# generator leftovers and one-off migration scripts
+/experiments/page-generator/__pycache__/
+/experiments/page-generator/before-*/
+/experiments/page-generator/patch_*.py
+
+# Windows app: build output, downloaded SDK, local sandbox runs and their data
+/desktop/out/
+/desktop/vendor/
+/desktop/sandbox/*
+!/desktop/sandbox/sandbox-test.ps1
+!/desktop/sandbox/sandbox-functional.ps1
+!/desktop/sandbox/tools/
+/desktop/sandbox/tools/*
+!/desktop/sandbox/tools/ui-test.ps1
+
+# website publishing: dependencies, generated site and packages (packages are published as GitHub Release assets)
+/deploy/node_modules/
+/deploy/site/
+/deploy/dist/
+
+*.log

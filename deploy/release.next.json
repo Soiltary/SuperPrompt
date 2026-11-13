@@ -1,0 +1,12 @@
+{
+    "version":  "2.1.1",
+    "file":  "SuperPrompt-2.1.1-windows-x64-portable.zip",
+    "url":  "download/SuperPrompt-2.1.1-windows-x64-portable.zip",
+    "size_bytes":  885679,
+    "size_label":  "865 KB",
+    "type":  "Windows x64 Portable ZIP",
+    "sha256":  "ac4e7c7de1f1b930bb1835b8c667ede9854b6fb690e51302c38685ec6b76aafa",
+    "date":  "2026-11-13",
+    "notes_url":  "https://github.com/Soiltary/SuperPrompt/releases/tag/v2.1.1",
+    "github_url":  "https://github.com/Soiltary/SuperPrompt/releases/download/v2.1.1/SuperPrompt-2.1.1-windows-x64-portable.zip"
+}
