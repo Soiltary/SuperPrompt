@@ -118,7 +118,6 @@ html[dir="rtl"] .arr { display: inline-block; transform: scaleX(-1); }
 /* video */
 .video-frame { margin: 0; padding: 10px; border-radius: 26px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
 .video-frame video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 18px; background: #070818; }
-video::cue { font-family: "Plex Arabic", "Segoe UI", sans-serif; font-size: 1.05em; background: rgba(7, 8, 24, 0.82); color: #fff; }
 
 /* download */
 .dl { display: grid; justify-items: center; text-align: center; gap: 0; padding: 56px 28px 40px; border-radius: 30px; border: 1px solid var(--line-2);

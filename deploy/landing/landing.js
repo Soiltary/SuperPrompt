@@ -99,12 +99,10 @@
     if (v.getAttribute("data-lang") !== lang) {
       var playing = !v.paused; v.setAttribute("data-lang", lang);
       v.setAttribute("poster", "assets/video/poster-" + lang + ".jpg");
-      document.getElementById("tr-en").src = "assets/video/superprompt-demo-" + lang + ".en.vtt";
-      document.getElementById("tr-ar").src = "assets/video/superprompt-demo-" + lang + ".ar.vtt";
       v.setAttribute("src", "assets/video/superprompt-demo-" + lang + ".mp4");
       if (playing) v.play().catch(function () {});
     }
-    for (var i = 0; i < v.textTracks.length; i++) v.textTracks[i].mode = v.textTracks[i].language === lang ? "showing" : "disabled";
+    // no subtitle overlay: the recorded interface already shows its own text
     try { localStorage.setItem("mpz-ui-lang", lang); } catch (e) {}
   }
   document.getElementById("lang-btn").addEventListener("click", function () { apply(doc.lang === "ar" ? "en" : "ar"); });

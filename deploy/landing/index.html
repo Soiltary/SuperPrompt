@@ -21,9 +21,9 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@Soiltary">
-<link rel="stylesheet" href="landing.css?v={{VERSION}}">
+<link rel="stylesheet" href="landing.css?v={{VERSION}}-2">
 <script>(function(){try{var d=document.documentElement,s=localStorage,t=s.getItem('mpz-theme');if(t!=='dark'&&t!=='light'){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}d.setAttribute('data-theme',t);var l=s.getItem('mpz-ui-lang');if(l==='ar'){d.lang='ar';d.dir='rtl';}}catch(e){}})();</script>
-<script src="landing.js?v={{VERSION}}" defer></script>
+<script src="landing.js?v={{VERSION}}-2" defer></script>
 </head>
 <body data-version="{{VERSION}}" data-size="{{SIZE}}" data-video-en="{{VIDEO_EN}}" data-video-ar="{{VIDEO_AR}}">
 <a class="skip" href="#main" data-t="skip">Skip to content</a>
@@ -101,10 +101,7 @@
         <div class="side"><span class="tag" dir="ltr" id="video-tag">26 SEC / MP4</span><p data-t="video.p">Write a request, choose the format and detail level, generate and copy</p></div>
       </div>
       <figure class="video-frame">
-        <video id="demo" controls playsinline preload="none" width="1600" height="900">
-          <track id="tr-en" kind="subtitles" srclang="en" label="English" src="assets/video/superprompt-demo-en.en.vtt" default>
-          <track id="tr-ar" kind="subtitles" srclang="ar" label="العربية" src="assets/video/superprompt-demo-en.ar.vtt">
-        </video>
+        <video id="demo" controls playsinline preload="none" width="1600" height="900"></video>
       </figure>
     </div>
   </section>
